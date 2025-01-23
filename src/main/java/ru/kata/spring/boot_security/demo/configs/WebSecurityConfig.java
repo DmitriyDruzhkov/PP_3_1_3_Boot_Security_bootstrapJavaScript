@@ -33,7 +33,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN")
+                .antMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN")
                 .antMatchers("/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                .antMatchers("/api/user/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .csrf().disable()
@@ -49,35 +51,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
     }
 
-    // Преобразователь паролей
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // аутентификация через БД
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider daoauthenticationProvider = new DaoAuthenticationProvider();
-        // подключаем PasswordEncoder
         daoauthenticationProvider.setPasswordEncoder(passwordEncoder());
-        // проверяем существует пользователь или нет.
         daoauthenticationProvider.setUserDetailsService((UserDetailsService) userService);
 
         return daoauthenticationProvider;
     }
 
-    // аутентификация inMemory
-//    @Bean
-//    @Override
-//    public UserDetailsService userDetailsService() {
-//        UserDetails user =
-//                User.withDefaultPasswordEncoder()
-//                        .username("user")
-//                        .password("user")
-//                        .roles("USER")
-//                        .build();
-//
-//        return new InMemoryUserDetailsManager(user);
-//    }
 }
